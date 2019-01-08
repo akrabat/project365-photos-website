@@ -1,0 +1,11 @@
+{
+  "autoload": {
+    "psr-4": {
+      "Project365\\": "src/"
+    }
+  },
+  "require": {
+    "guzzlehttp/guzzle": "^6.3",
+    "aws/aws-sdk-php": "^3.82"
+  }
+}

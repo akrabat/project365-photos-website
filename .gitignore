@@ -1,0 +1,11 @@
+# package directories
+vendor/
+
+# Serverless directories
+.serverless
+
+# App-specific
+docs/*.html
+settings.yml
+public/2*
+layer/php/php

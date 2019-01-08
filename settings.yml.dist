@@ -1,0 +1,6 @@
+P365_FLICKR_API_KEY: "{Flickr API key}"
+P365_FLICKR_USER_ID: "{Flickr User ID. Format: nnnnnnnn@N00}"
+P365_SITE_NAME: "project365.example.com"
+P365_BUCKET_NAME: "example-project365"
+# AWS Certificate Manager certificate must be in US-EAST-1 (N. Viginia)
+P365_CERTIFICATE_ARN: "arn:aws:acm:us-east-1:xxxxxxxxxxx:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"

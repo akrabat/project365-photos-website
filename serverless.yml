@@ -62,7 +62,7 @@ functions:
       - schedule:
           name: project365-rebuild
           description: "Rebuild this year's page"
-          rate: cron(0 */2 * * ? *)
+          rate: cron(0/30 8-23 * * ? *)
 
 # CloudFormation resource templates
 resources:

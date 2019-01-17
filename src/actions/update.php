@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use Project365\Updater;
+use Project365\PhotoPageCreator;
 use Project365\Uploader;
 
 include_once 'vendor/autoload.php';

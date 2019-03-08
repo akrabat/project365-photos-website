@@ -38,7 +38,7 @@ function main(array $eventData) : array
     echo "Creating photo page for $year\n";
     $templateDir = realpath('templates');
     $creator = new PhotoPageCreator($flickrApiKey);
-    $html = $creator->update($year, $flickrUserId, $templateDir, $outputDir);
+    $html = $creator->update($year, $flickrUserId, $templateDir);
     if ($html) {
         echo "Uploading $year.html to S3\n";
         $filename = "$year.html";

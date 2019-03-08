@@ -20,10 +20,10 @@ function main(array $eventData) : array
         return $response;
     }
 
-    $flickrApiKey = getSetting('P365_FLICKR_API_KEY');
-    $flickrUserId = getSetting('P365_FLICKR_USER_ID');
-    $s3BucketName = getSetting('P365_BUCKET_NAME');
-    $cloudFrontId = getSetting('P365_CLOUDFRONT_ID');
+    $flickrApiKey = getEnvVar('P365_FLICKR_API_KEY');
+    $flickrUserId = getEnvVar('P365_FLICKR_USER_ID');
+    $s3BucketName = getEnvVar('P365_BUCKET_NAME');
+    $cloudFrontId = getEnvVar('P365_CLOUDFRONT_ID');
 
     if (isset($eventData['upload_assets'])) {
         // upload all assets from the public directory to the S3 bucket
@@ -50,7 +50,7 @@ function main(array $eventData) : array
     return ['result' => "Created $year.html and uploaded to S3"];
 }
 
-function getSetting(string $key, string $default = '') : string
+function getEnvVar(string $key, string $default = '') : string
 {
     $value = getenv($key) ?? $default;
     if (empty($value)) {

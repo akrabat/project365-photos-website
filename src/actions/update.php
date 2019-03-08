@@ -34,8 +34,8 @@ function main(array $eventData) : array
     }
 
     // Fetch images from Flicker, create HTML page for year & upload to S3
-    echo "Creating photo page for $year\n";
     $year = $eventData['year'] ?? date('Y');
+    echo "Creating photo page for $year\n";
     $templateDir = realpath('templates');
     $creator = new PhotoPageCreator($flickrApiKey);
     $html = $creator->update($year, $flickrUserId, $templateDir, $outputDir);

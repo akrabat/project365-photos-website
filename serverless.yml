@@ -23,7 +23,7 @@ provider:
   name: aws
   runtime: provided
   region: eu-west-2
-  memorySize: 128
+  memorySize: 512
 
 #  stage: dev
 

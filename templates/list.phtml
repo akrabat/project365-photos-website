@@ -1,0 +1,33 @@
+<?php include __DIR__ . '/header.phtml' ?>
+
+<div class="page-content">
+    <section>
+        <!-- <?= count($photos['photo']); ?> photos -->
+        <?php foreach ($photos['photo'] as $photo) :
+            $title = htmlentities($photo['title']);
+            $imageUrl = htmlentities($photo['url_z']);
+            $width = (int)$photo['width_z'];
+            $height = (int)$photo['height_z'];
+            $dateTaken = htmlentities($photo['datetaken']);
+            $date = date('j F Y', strtotime($photo['datetaken']));
+            $pageUrl = htmlentities(sprintf('https://www.flickr.com/photos/%s/%s/in/photostream/',
+                $photo['ownername'],
+                $photo['id']
+            ));
+            ?>
+            <article>
+                <figure>
+                    <figcaption>
+                        <?= $title ?>
+                        <time datetime="<?= $dateTaken ?>"><?= $date ?></time>
+                    </figcaption>
+                    <a data-flickr-embed="true"  href="<?= $pageUrl ?>" title="<?= $title ?>">
+                        <img src="<?= $imageUrl ?>" width="<?= $width?>" height="<?= $height ?>" alt="<?= $title ?>">
+                    </a>
+                </figure>
+            </article>
+        <?php endforeach ?>
+    </section>
+</div>
+
+<?php include __DIR__ . '/footer.phtml' ?>

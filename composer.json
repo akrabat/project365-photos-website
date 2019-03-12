@@ -1,0 +1,10 @@
+{
+  "autoload": {
+    "psr-4": {
+      "Project365\\": "src/"
+    }
+  },
+  "require": {
+    "mnapoli/bref": "^0.3.5"
+  }
+}

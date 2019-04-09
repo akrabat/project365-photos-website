@@ -45,6 +45,17 @@ class PageCreator
         $client = new Client(['base_uri' => 'https://api.flickr.com/services/rest']);
         $response = $client->get($url);
         $data = json_decode((string)$response->getBody(), true);
+
+        // sort
+        $photos = [];
+        foreach ($data['photos']['photo'] as $photo) {
+            $date = date('Ymd', strtotime($photo['datetaken']));
+            $photos[$date] = $photo;
+        }
+        krsort($photos);
+
+        $data['photos']['photo'] = $photos;
+
         return $data['photos'];
     }
 

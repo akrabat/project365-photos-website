@@ -6,7 +6,7 @@ use Project365\Uploader;
 require __DIR__.'/vendor/autoload.php';
 
 lambda(function (array $event) {
-    $year = $eventData['year'] ?? date('Y');
+    $year = $event['year'] ?? date('Y');
     error_log('Creating photo page for ' . $year . '...');
 
     $flickrApiKey = getenv('FLICKR_API_KEY');

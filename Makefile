@@ -1,5 +1,5 @@
 # vim: noexpandtab tabstop=4 filetype=make
-.PHONY: deploy package clean invoke
+.PHONY: list update upload-assets local-update local-upload-assets deploy clean clean-all setup geterror
 
 REGION := us-east-1
 PROJECT_NAME := project365-akrabat
@@ -7,22 +7,27 @@ PROJECT_NAME := project365-akrabat
 BUCKET_NAME := $(PROJECT_NAME)-brefapp
 STACK_NAME := $(PROJECT_NAME)-brefapp
 
-invoke-local-update:
-	sam local invoke Update --no-event
+list:
+	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
 
-invoke-remote-update:
+update:
 	vendor/bin/bref --region=$(REGION) invoke update --event '{"year": "2019"}'
 
-invoke-local-upload-assets:
-	sam local invoke UploadAssets --no-event
 
-invoke-remote-upload-assets:
+upload-assets:
 	aws lambda invoke --function-name uploadassets --payload '{}' \
 	--invocation-type RequestResponse --log-type Tail \
 	outfile.txt | jq '.LogResult' -r | base64 --decode && cat outfile.txt | jq '.result' \
 	&& rm outfile.txt
 
+local-update:
+	sam local invoke Update --no-event
+
+local-upload-assets:
+	sam local invoke UploadAssets --no-event
+
 deploy:
+	rm -f error.txt
 	sam package \
 		--region $(REGION) \
 		--template-file template.yaml \

@@ -25,13 +25,5 @@ lambda(function (array $event) {
         $uploader->uploadOne($filename, $html, $bucketName);
     }
 
-    return 'Created ' . $year . '.html and uploaded to S3';
-
-
-    error_log("Uploading assests...");
-    var_dump($event);
-    var_dump(getenv('FLICKR_API_KEY'));
-    var_dump(getenv('FLICKR_USER'));
-
-    return 'Hello ' . ($event['name'] ?? 'world') . '!';
+    return ['result' => 'Created ' . $year . '.html and uploaded to S3'];
 });

@@ -5,17 +5,17 @@ Description: 'Project 365 website'
 Parameters:
     WebsiteDomain:
         Type: 'AWS::SSM::Parameter::Value<String>'
-        Default: 'WebsiteDomain'
+        Default: 'P365LiveWebsiteDomain'
     FlickrApiKey:
         # note: no version needed here. If you use '{{resolve:ssm:FlickrApiKey:1}}', then you need to specify the version.
         Type: 'AWS::SSM::Parameter::Value<String>'
-        Default: 'FlickrApiKey'
+        Default: 'P365LiveFlickrApiKey'
     WebsiteBucketName:
         Type: 'AWS::SSM::Parameter::Value<String>'
-        Default: 'WebsiteBucketName'
+        Default: 'P365LiveWebsiteBucketName'
     FlickrUserId:
         Type: 'AWS::SSM::Parameter::Value<String>'
-        Default: 'FlickrUserId'
+        Default: 'P365LiveFlickrUserId'
 
 
 Resources:

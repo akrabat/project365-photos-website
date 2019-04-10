@@ -75,6 +75,11 @@ Resources:
                     FLICKR_USER_ID: !Ref FlickrUserId
                     BUCKET_NAME: !Ref WebsiteBucketName
                     CLOUDFRONT_ID: !Ref WebsiteCloudFrontDistribution
+            Events:
+                UpdateIt:
+                    Type: Schedule
+                    Properties:
+                      Schedule: cron(0 22 * * ? *)
 
     # S3 bucket to store website files
     WebsiteBucket:

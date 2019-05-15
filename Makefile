@@ -2,7 +2,7 @@
 .PHONY: list update upload-assets local-update local-upload-assets deploy clean clean-all setup geterror
 
 REGION := us-east-1
-PROJECT_NAME := project365-akrabat
+PROJECT_NAME := project365-YOUR-NAME-HERE
 
 BUCKET_NAME := $(PROJECT_NAME)-brefapp
 STACK_NAME := $(PROJECT_NAME)-brefapp

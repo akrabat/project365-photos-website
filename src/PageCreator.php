@@ -46,13 +46,28 @@ class PageCreator
         $response = $client->get($url);
         $data = json_decode((string)$response->getBody(), true);
 
+        if (!is_array($data)) {
+            error_log('Unexpected response from API.');
+            error_log('API response: ' . $response->getStatusCode());
+            error_log('API body: ' . (string)$response->getBody());
+            throw new RuntimeException('Unexpected response from API.');
+        }
+
         // sort
         $photos = [];
         foreach ($data['photos']['photo'] as $photo) {
             $date = date('Ymd', strtotime($photo['datetaken']));
             $photos[$date] = $photo;
         }
+        if (empty($photos)) {
+            error_log('No photos returned.');
+            error_log('API response: ' . $response->getStatusCode());
+            error_log('API body: ' . (string)$response->getBody());
+            throw new RuntimeException('No photos returned');
+        }
         krsort($photos);
+
+        error_log('Found ' . count($photos) . ' photos.');
 
         $data['photos']['photo'] = $photos;
 

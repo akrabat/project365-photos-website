@@ -37,7 +37,7 @@ class PageCreator
             'method' => 'flickr.photos.search',
             'per_page' => '366',
             'sort' => 'date-taken-desc',
-            'tags' => $year,
+            'tags' => '365:' . $year,
         ];
 
         $url = '?' . http_build_query($urlParamers);

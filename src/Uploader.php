@@ -93,7 +93,7 @@ final class Uploader
             'ContentType' => $contentType,
         ]);
 
-        error_log("Uploaded $filename ($contentType) to S3\n");
+        error_log("Uploaded $filename ($contentType) to S3");
         return;
     }
 

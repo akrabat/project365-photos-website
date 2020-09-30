@@ -1,11 +1,11 @@
-# Project365
+# Project365:-
 
 Source code for [project365.akrabat.com](https://project365.akrabat.com).
 
 This static site displays my photo-a-day picture for each day of the year. It is hosted on S3 behind CloudFront. A Lambda/PHP function fetches the photos from Flickr and generates a static HTML file that it uploads to S3 & then invalidates the CloudFront cache.
 
 
-## Set up
+## Set up:-
 
 1. Install AWS cli: 
 
@@ -31,14 +31,14 @@ This static site displays my photo-a-day picture for each day of the year. It is
 
 ## Create application
 
-    make deploy
+    make deploy.
 
 ## Run actions:
 
 1. Upload static assets to bucket:
 
-        make upload-assets
+        make upload-assets.
     
 2. Create 2019.html from Flickr data and upload to bucket:
 
-        make update
+        make update.

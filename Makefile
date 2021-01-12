@@ -11,14 +11,15 @@ list:
 	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
 
 update:
-	vendor/bin/bref --region=$(REGION) invoke update --event '{"year": "2020"}'
+	vendor/bin/bref --region=$(REGION) invoke update --event '{"year": "2021"}'
 
 
 upload-assets:
-	aws lambda invoke --function-name uploadassets --payload '{}' \
-	--invocation-type RequestResponse --log-type Tail \
-	outfile.txt | jq '.LogResult' -r | base64 --decode && cat outfile.txt | jq '.result' \
-	&& rm outfile.txt
+	vendor/bin/bref --region=$(REGION) invoke uploadassets --event '{}'
+	# aws lambda invoke --function-name uploadassets --payload '{}' \
+	# --invocation-type RequestResponse --log-type Tail \
+	# outfile.txt | jq '.LogResult' -r | base64 --decode && cat outfile.txt | jq '.result' \
+	# && rm outfile.txt
 
 local-update:
 	sam local invoke Update --no-event

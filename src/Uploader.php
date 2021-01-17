@@ -4,7 +4,6 @@ namespace Project365;
 
 use Aws\CloudFront\CloudFrontClient;
 use Aws\S3\S3Client;
-use GuzzleHttp\Client;
 use RuntimeException;
 
 final class Uploader
@@ -13,8 +12,12 @@ final class Uploader
     private $s3;
     private $cft;
 
-    public function __construct(string $distributionId, Client $s3 = null, CloudFrontClient $cft = null)
+    public function __construct(string $distributionId = null, S3Client $s3 = null, CloudFrontClient $cft = null)
     {
+        if ($distributionId === null) {
+            $distributionId = (string)getenv('CLOUDFRONT_ID');
+        }
+
         $this->distributionId = $distributionId;
         if (!$s3) {
             $s3 = new S3Client([

@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use Project365\PageCreator;
+use Project365\PhotoFetcher;
 use Project365\Uploader;
 
 require __DIR__.'/vendor/autoload.php';
@@ -9,19 +10,18 @@ lambda(function (array $event) {
     $year = $event['year'] ?? date('Y');
     error_log('Creating photo page for ' . $year . '...');
 
-    $flickrApiKey = getenv('FLICKR_API_KEY');
     $flickrUserId = getenv('FLICKR_USER_ID');
     $bucketName = getenv('BUCKET_NAME');
     $cloudFrontId = getenv('CLOUDFRONT_ID');
 
     // Fetch images from Flicker, create HTML page for year & upload to S3
     $templateDir = realpath('templates');
-    $creator = new PageCreator($flickrApiKey);
     try {
-        $html = $creator->update($year, $flickrUserId, $templateDir);
+        $photos = (new PhotoFetcher())->fetchPhotosForYear($year, $flickrUserId);
+        $html = (new PageCreator())->createYearPage($year, $photos, $templateDir);
         if ($html) {
-            error_log('Uploading ' . $year . '.html to S3');
             $filename = $year . '.html';
+            error_log('Uploading ' . $filename . ' to S3');
             $uploader = new Uploader($cloudFrontId);
             $uploader->uploadOne($filename, $html, $bucketName);
         }

@@ -1,21 +1,46 @@
 service: project365
-useDotenv: true
 
 provider:
     name: aws
+    stage: ${file(./env.json):stage}
     region: eu-west-2
     runtime: provided.al2
     lambdaHashingVersion: "20201221"
+    environment:
+        BUCKET_NAME: ${file(./env.json):websiteBucketName}
+        FLICKR_API_KEY: ${file(./env.json):flickrApiKey}
+        FLICKR_USER_ID: ${file(./env.json):flickrUserId}
+        WEBSITE_DOMAIN: ${file(./env.json):websiteDomain}
+        CLOUDFRONT_ID:
+            Ref: websiteCDN
+    iam:
+        role:
+            statements:
+                - Effect: "Allow"
+                  Action:
+                      - "s3:*"
+                      - cloudfront:CreateInvalidation
+                  Resource:
+                      - "*"
+
 
 plugins:
-  - ./vendor/bref/bref
+    - ./vendor/bref/bref
 
 functions:
-    update:
-        handler: update.php
-        description: ''
+    upload-assets:
+        handler: upload-assets.php
+        description: 'Upload assets to S3 bucket'
         layers:
             - ${bref:layer.php-80}
+
+    update:
+        handler: update.php
+        description: 'Create new Year HTML page'
+        layers:
+            - ${bref:layer.php-80}
+        events:
+            - schedule: cron(0 22 * * ? *)  # 10pm every day
 
 # Exclude files from deployment
 package:
@@ -71,7 +96,7 @@ resources:
         websiteRequestFunction:
             Type: 'AWS::CloudFront::Function'
             Properties:
-                Name: project365-dev-eu-west-2-website-request
+                Name: project365-${file(./env.json):stage}-eu-west-2-website-request
                 AutoPublish: true
                 FunctionCode: |-
                     function handler(event) {
@@ -79,12 +104,12 @@ resources:
                         return request;
                     }
                 FunctionConfig:
-                    Comment: project365-dev-eu-west-2-website-request
+                    Comment: project365-${file(./env.json):stage}-eu-west-2-website-request
                     Runtime: cloudfront-js-1.0
         websiteResponseFunction:
             Type: 'AWS::CloudFront::Function'
             Properties:
-                Name: project365-dev-eu-west-2-website-response
+                Name: project365-${file(./env.json):stage}-eu-west-2-website-response
                 AutoPublish: true
                 FunctionCode: |-
                     function handler(event) {
@@ -106,7 +131,7 @@ resources:
                         return response;
                     }
                 FunctionConfig:
-                    Comment: project365-dev-eu-west-2-website-response
+                    Comment: project365-${file(./env.json):stage}-eu-west-2-website-response
                     Runtime: cloudfront-js-1.0
         websiteCDN:
             Type: 'AWS::CloudFront::Distribution'
@@ -114,7 +139,7 @@ resources:
                 DistributionConfig:
                     Aliases:
                         - ${file(./env.json):websiteDomain}
-                    Comment: project365 website CDN
+                    Comment: project365 ${file(./env.json):stage} website CDN
                     CustomErrorResponses:
                         -   ErrorCachingMinTTL: 0
                             ErrorCode: 404

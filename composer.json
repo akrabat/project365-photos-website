@@ -1,6 +1,17 @@
 {
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Project365\\": "src/"
+        }
+    },
     "require": {
         "php": "8.0.*",
+        "ext-fileinfo": "*",
+        "aws/aws-sdk-php": "^3.194",
         "bref/bref": "^1.2"
     }
 }

@@ -1,0 +1,205 @@
+service: project365
+
+provider:
+    name: aws
+    stage: ${file(./env.json):stage}
+    region: eu-west-2
+    runtime: provided.al2
+    lambdaHashingVersion: "20201221"
+    environment:
+        BUCKET_NAME: ${file(./env.json):websiteBucketName}
+        FLICKR_API_KEY: ${file(./env.json):flickrApiKey}
+        FLICKR_USER_ID: ${file(./env.json):flickrUserId}
+        WEBSITE_DOMAIN: ${file(./env.json):websiteDomain}
+        CLOUDFRONT_ID:
+            Ref: websiteCDN
+    iam:
+        role:
+            statements:
+                - Effect: "Allow"
+                  Action:
+                      - "s3:*"
+                      - cloudfront:CreateInvalidation
+                  Resource:
+                      - "*"
+
+
+plugins:
+    - ./vendor/bref/bref
+
+functions:
+    upload-assets:
+        handler: upload-assets.php
+        description: 'Upload assets to S3 bucket'
+        layers:
+            - ${bref:layer.php-80}
+
+    update:
+        handler: update.php
+        description: 'Create new Year HTML page'
+        layers:
+            - ${bref:layer.php-80}
+        events:
+            - schedule: cron(0 22 * * ? *)  # 10pm every day
+
+# Exclude files from deployment
+package:
+    patterns:
+        - '!tests/**'
+        - '!env-*.json'
+        - '!env.json'
+        - 'LICENSE'
+        - 'README.md'
+        - '.gitignore'
+
+resources:
+    Resources:
+        websiteBucket:
+            Type: 'AWS::S3::Bucket'
+            Properties:
+                BucketName: ${file(./env.json):websiteBucketName}
+            UpdateReplacePolicy: Delete
+            DeletionPolicy: Delete
+        websiteBucketPolicy:
+            Type: 'AWS::S3::BucketPolicy'
+            Properties:
+                Bucket:
+                    Ref: websiteBucket
+                PolicyDocument:
+                    Statement:
+                        -   Action:
+                                - 's3:GetObject*'
+                                - 's3:GetBucket*'
+                                - 's3:List*'
+                            Effect: Allow
+                            Principal:
+                                CanonicalUser:
+                                    'Fn::GetAtt':
+                                        - websiteOriginAccessIdentity
+                                        - S3CanonicalUserId
+                            Resource:
+                                -   'Fn::GetAtt':
+                                        - websiteBucket
+                                        - Arn
+                                -   'Fn::Join':
+                                        - ''
+                                        -   -   'Fn::GetAtt':
+                                                    - websiteBucket
+                                                    - Arn
+                                            - /*
+                    Version: '2012-10-17'
+        websiteOriginAccessIdentity:
+            Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+            Properties:
+                CloudFrontOriginAccessIdentityConfig:
+                    Comment: Identity that represents CloudFront for the website.
+        websiteRequestFunction:
+            Type: 'AWS::CloudFront::Function'
+            Properties:
+                Name: project365-${file(./env.json):stage}-eu-west-2-website-request
+                AutoPublish: true
+                FunctionCode: |-
+                    function handler(event) {
+                        var request = event.request;
+                        return request;
+                    }
+                FunctionConfig:
+                    Comment: project365-${file(./env.json):stage}-eu-west-2-website-request
+                    Runtime: cloudfront-js-1.0
+        websiteResponseFunction:
+            Type: 'AWS::CloudFront::Function'
+            Properties:
+                Name: project365-${file(./env.json):stage}-eu-west-2-website-response
+                AutoPublish: true
+                FunctionCode: |-
+                    function handler(event) {
+                        var response = event.response;
+                        response.headers = Object.assign({}, {
+                        "x-frame-options": {
+                            "value": "SAMEORIGIN"
+                        },
+                        "x-content-type-options": {
+                            "value": "nosniff"
+                        },
+                        "x-xss-protection": {
+                            "value": "1; mode=block"
+                        },
+                        "strict-transport-security": {
+                            "value": "max-age=63072000"
+                        }
+                    }, response.headers);
+                        return response;
+                    }
+                FunctionConfig:
+                    Comment: project365-${file(./env.json):stage}-eu-west-2-website-response
+                    Runtime: cloudfront-js-1.0
+        websiteCDN:
+            Type: 'AWS::CloudFront::Distribution'
+            Properties:
+                DistributionConfig:
+                    Aliases:
+                        - ${file(./env.json):websiteDomain}
+                    Comment: project365 ${file(./env.json):stage} website CDN
+                    CustomErrorResponses:
+                        -   ErrorCachingMinTTL: 0
+                            ErrorCode: 404
+                            ResponseCode: 404
+                            ResponsePagePath: /error.html
+                    DefaultCacheBehavior:
+                        AllowedMethods:
+                            - GET
+                            - HEAD
+                            - OPTIONS
+                        CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+                        Compress: true
+                        FunctionAssociations:
+                            -   EventType: viewer-request
+                                FunctionARN:
+                                    'Fn::GetAtt':
+                                        - websiteRequestFunction
+                                        - FunctionARN
+                            -   EventType: viewer-response
+                                FunctionARN:
+                                    'Fn::GetAtt':
+                                        - websiteResponseFunction
+                                        - FunctionARN
+                        TargetOriginId: websiteCDNOrigin
+                        ViewerProtocolPolicy: redirect-to-https
+                    DefaultRootObject: index.html
+                    Enabled: true
+                    HttpVersion: http2
+                    IPV6Enabled: true
+                    Origins:
+                        -   DomainName:
+                                'Fn::GetAtt':
+                                    - websiteBucket
+                                    - RegionalDomainName
+                            Id: websiteCDNOrigin
+                            S3OriginConfig:
+                                OriginAccessIdentity:
+                                    'Fn::Join':
+                                        - ''
+                                        -   - origin-access-identity/cloudfront/
+                                            -   Ref: websiteOriginAccessIdentity
+                    ViewerCertificate:
+                        AcmCertificateArn: ${file(./env.json):certificateArn}
+                        MinimumProtocolVersion: TLSv1.2_2019
+                        SslSupportMethod: sni-only
+    Outputs:
+        websiteBucketName:
+            Description: Name of the website bucket.
+            Value:
+                Ref: websiteBucket
+        websiteDomain:
+            Description: Website domain name.
+            Value: ${file(./env.json):websiteDomain}
+        websiteCloudFrontCName:
+            Description: CloudFront CNAME.
+            Value:
+                'Fn::GetAtt':
+                    - websiteCDN
+                    - DomainName
+        websiteDistributionId:
+            Description: ID of the CloudFront distribution.
+            Value:
+                Ref: websiteCDN

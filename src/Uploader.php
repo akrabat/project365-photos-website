@@ -8,9 +8,9 @@ use RuntimeException;
 
 final class Uploader
 {
-    private $distributionId;
-    private $s3;
-    private $cft;
+    private string $distributionId;
+    private S3Client $s3;
+    private CloudFrontClient $cft;
 
     public function __construct(string $distributionId = null, S3Client $s3 = null, CloudFrontClient $cft = null)
     {
@@ -40,14 +40,13 @@ final class Uploader
      * Upload a single Year File
      * @param  string $year [description]
      * @param  string $dir  [description]
-     * @return [type]       [description]
      */
-    public function upload(string $year, string $dir, string $bucket)
+    public function upload(string $year, string $dir, string $bucket): void
     {
         $filename = "$year.html";
         $data = file_get_contents("$dir/$filename");
         $this->uploadOne($filename, $data, $bucket);
-        $this->invalidate([$filename]);
+        $this->invalidateCache('/'.$filename);
     }
 
     /**
@@ -58,15 +57,15 @@ final class Uploader
         $filenames = [];
         $d = dir($dir);
         while (false !== ($filename = $d->read())) {
-            if ($filename[0] == '.') {
+            if ($filename[0] === '.') {
                 continue;
             }
             $data = file_get_contents("$dir/$filename");
             $this->sendToS3($filename, $data, $bucket);
-            $filenames[] = "/$filename";
+            $filenames[] = "$filename";
         }
         $d->close();
-        $this->invalidate($filenames);
+        $this->invalidateCache($filenames);
     }
 
     /**
@@ -74,10 +73,10 @@ final class Uploader
      *
      * See: https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_commands.html
      */
-    public function uploadOne(string $filename, string $data, string $bucket) : void
+    public function uploadOne(string $filename, string $data, string $bucket) : string
     {
         $this->sendToS3($filename, $data, $bucket);
-        $this->invalidate(['/'.$filename]);
+        return $bucket;
     }
 
     /**
@@ -88,7 +87,7 @@ final class Uploader
     private function sendToS3(string $filename, string $data, string $bucket) : void
     {
         $contentType = $this->detectContentType($filename);
-        $result = $this->s3->putObject([
+        $this->s3->putObject([
             'Bucket' => $bucket,
             'ACL' => 'public-read',
             'Key' => $filename,
@@ -97,27 +96,31 @@ final class Uploader
         ]);
 
         error_log("Uploaded $filename ($contentType) to S3");
-        return;
     }
 
     private function detectContentType(string $filename) : string
     {
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
-        switch ($ext) {
-            case 'css':
-                return 'text/css';
-            case 'html':
-                return 'text/html';
-            default:
-                return mime_content_type($filename);
-        }
+        return match ($ext) {
+            'css' => 'text/css',
+            'html' => 'text/html',
+            default => mime_content_type($filename),
+        };
     }
 
-    private function invalidate(array $filenames) : void
+    public function invalidateCache(string|array $filenames) : void
     {
+        if (is_string($filenames)) {
+            $filenames = [$filenames];
+        }
+
         if (empty($filenames)) {
             return;
         }
+
+        $filenames = array_map(static fn ($f) => '/'.$f, $filenames);
+
+        error_log("Filenames to invalidate: " . print_r($filenames, true));
 
         $ref = date('YmdHis');
         $result = $this->cft->createInvalidation([

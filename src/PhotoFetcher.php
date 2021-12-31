@@ -19,6 +19,10 @@ class PhotoFetcher
      */
     public function fetchPhotosForYear(string $year, string $flickrUserId) : array
     {
+        if (empty($this->flickrApiKey)) {
+            throw new RuntimeException("Missing FLICKR_API_KEY");
+        }
+
         $urlParamers = [
             'api_key' => $this->flickrApiKey,
             'user_id' => $flickrUserId,

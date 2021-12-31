@@ -1,16 +1,21 @@
 service: project365
 
+variablesResolutionMode: 20210326
+
+custom:
+    stage: ${opt:stage, env:P365_STAGE} # stage from `--stage` cli or `P365_STAGE` environment var
+
 provider:
     name: aws
-    stage: ${file(./env.json):stage}
+    stage: dev
     region: eu-west-2
     runtime: provided.al2
     lambdaHashingVersion: "20201221"
     environment:
-        BUCKET_NAME: ${file(./env.json):websiteBucketName}
-        FLICKR_API_KEY: ${file(./env.json):flickrApiKey}
-        FLICKR_USER_ID: ${file(./env.json):flickrUserId}
-        WEBSITE_DOMAIN: ${file(./env.json):websiteDomain}
+        BUCKET_NAME: ${file(./config.${self:custom.stage}.json):websiteBucketName}
+        FLICKR_API_KEY: ${file(./config.${self:custom.stage}.json):flickrApiKey}
+        FLICKR_USER_ID: ${file(./config.${self:custom.stage}.json):flickrUserId}
+        WEBSITE_DOMAIN: ${file(./config.${self:custom.stage}.json):websiteDomain}
         CLOUDFRONT_ID:
             Ref: websiteCDN
     iam:
@@ -57,7 +62,7 @@ resources:
         websiteBucket:
             Type: 'AWS::S3::Bucket'
             Properties:
-                BucketName: ${file(./env.json):websiteBucketName}
+                BucketName: ${file(./config.${self:custom.stage}.json):websiteBucketName}
             UpdateReplacePolicy: Delete
             DeletionPolicy: Delete
         websiteBucketPolicy:
@@ -96,7 +101,7 @@ resources:
         websiteRequestFunction:
             Type: 'AWS::CloudFront::Function'
             Properties:
-                Name: project365-${file(./env.json):stage}-eu-west-2-website-request
+                Name: project365-${self:custom.stage}-eu-west-2-website-request
                 AutoPublish: true
                 FunctionCode: |-
                     function handler(event) {
@@ -104,12 +109,12 @@ resources:
                         return request;
                     }
                 FunctionConfig:
-                    Comment: project365-${file(./env.json):stage}-eu-west-2-website-request
+                    Comment: project365-${self:custom.stage}-eu-west-2-website-request
                     Runtime: cloudfront-js-1.0
         websiteResponseFunction:
             Type: 'AWS::CloudFront::Function'
             Properties:
-                Name: project365-${file(./env.json):stage}-eu-west-2-website-response
+                Name: project365-${self:custom.stage}-eu-west-2-website-response
                 AutoPublish: true
                 FunctionCode: |-
                     function handler(event) {
@@ -131,15 +136,15 @@ resources:
                         return response;
                     }
                 FunctionConfig:
-                    Comment: project365-${file(./env.json):stage}-eu-west-2-website-response
+                    Comment: project365-${self:custom.stage}-eu-west-2-website-response
                     Runtime: cloudfront-js-1.0
         websiteCDN:
             Type: 'AWS::CloudFront::Distribution'
             Properties:
                 DistributionConfig:
                     Aliases:
-                        - ${file(./env.json):websiteDomain}
-                    Comment: project365 ${file(./env.json):stage} website CDN
+                        - ${file(./config.${self:custom.stage}.json):websiteDomain}
+                    Comment: project365 ${self:custom.stage} website CDN
                     CustomErrorResponses:
                         -   ErrorCachingMinTTL: 0
                             ErrorCode: 404
@@ -182,7 +187,7 @@ resources:
                                         -   - origin-access-identity/cloudfront/
                                             -   Ref: websiteOriginAccessIdentity
                     ViewerCertificate:
-                        AcmCertificateArn: ${file(./env.json):certificateArn}
+                        AcmCertificateArn: ${file(./config.${self:custom.stage}.json):certificateArn}
                         MinimumProtocolVersion: TLSv1.2_2019
                         SslSupportMethod: sni-only
     Outputs:
@@ -192,7 +197,7 @@ resources:
                 Ref: websiteBucket
         websiteDomain:
             Description: Website domain name.
-            Value: ${file(./env.json):websiteDomain}
+            Value: ${file(./config.${self:custom.stage}.json):websiteDomain}
         websiteCloudFrontCName:
             Description: CloudFront CNAME.
             Value:

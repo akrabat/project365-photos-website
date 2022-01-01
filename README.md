@@ -28,3 +28,9 @@ For `prod`, either set the `P365_STAGE` environment variable using `export P365_
 2. Create this year's html page from Flickr data and upload to bucket:
 
         sls invoke -f update
+
+## Update for new year
+
+1. Update `assets/year.html` and `assets/index.html`
+2. Deploy: `sls deploy`
+3. Upload the new files to the bucket: `sls invoke -f upload-assets`

@@ -10,7 +10,6 @@ provider:
     stage: dev
     region: eu-west-2
     runtime: provided.al2
-    lambdaHashingVersion: "20201221"
     environment:
         BUCKET_NAME: ${file(./config.${self:custom.stage}.json):websiteBucketName}
         FLICKR_API_KEY: ${file(./config.${self:custom.stage}.json):flickrApiKey}
@@ -37,13 +36,13 @@ functions:
         handler: upload-assets.php
         description: 'Upload assets to S3 bucket'
         layers:
-            - ${bref:layer.php-80}
+            - ${bref:layer.php-81}
 
     update:
         handler: update.php
         description: 'Create new Year HTML page'
         layers:
-            - ${bref:layer.php-80}
+            - ${bref:layer.php-81}
         events:
             - schedule: cron(0 22 * * ? *)  # 10pm every day
 

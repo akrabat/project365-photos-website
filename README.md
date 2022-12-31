@@ -23,11 +23,15 @@ For `prod`, either set the `P365_STAGE` environment variable using `export P365_
 
 1. Upload static assets to bucket:
 
-        sls invoke -f upload-assets
+        sls invoke -f upload-assets --log
 
 2. Create this year's html page from Flickr data and upload to bucket:
 
-        sls invoke -f update
+        sls invoke -f update --log
+
+3. Create another year's html page from Flickr data and upload to bucket:
+
+        sls invoke -f update --data '{ "year": "2021"}' --log
 
 ## Update for new year
 

@@ -1,7 +1,5 @@
 service: project365
 
-variablesResolutionMode: 20210326
-
 custom:
     stage: ${opt:stage, env:P365_STAGE} # stage from `--stage` cli or `P365_STAGE` environment var
 

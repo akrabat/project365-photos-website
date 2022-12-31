@@ -34,13 +34,13 @@ functions:
         handler: upload-assets.php
         description: 'Upload assets to S3 bucket'
         layers:
-            - ${bref:layer.php-81}
+            - ${bref:layer.php-82}
 
     update:
         handler: update.php
         description: 'Create new Year HTML page'
         layers:
-            - ${bref:layer.php-81}
+            - ${bref:layer.php-82}
         events:
             - schedule: cron(0 22 * * ? *)  # 10pm every day
 

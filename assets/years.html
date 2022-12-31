@@ -35,18 +35,19 @@
 <div class="page-content">
     <section>
         <p>At least one photo every day.</p>
-        <ul>
-            <li><a href="/2022.html">2022</a></li>
-            <li><a href="/2021.html">2021</a></li>
-            <li><a href="/2020.html">2020</a></li>
-            <li><a href="/2019.html">2019</a></li>
-            <li><a href="/2018.html">2018</a></li>
-            <li><a href="/2017.html">2017</a></li>
-            <li><a href="/2016.html">2016</a></li>
-            <li><a href="/2015.html">2015</a></li>
-            <li><a href="/2014.html">2014</a></li>
-            <li><a href="/2013.html">2013</a></li>
+        <ul id="yearlist">
         </ul>
+        <script>
+            var years = Array.from(Array(new Date().getFullYear() - 2012), (_, i) => (i + 2013).toString())
+            years.reverse()
+
+            ul = document.getElementById('yearlist');
+            years.forEach(function(year){
+                var li = document.createElement('li');
+                ul.appendChild(li);
+                li.innerHTML = `<li><a href="/${year}.html">${year}</a></li>`;
+            });
+        </script>
     </section>
     <section>
         <p>Source code is on <a href="https://github.com/akrabat/project365-photos-website">GitHub</a></p>

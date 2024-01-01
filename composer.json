@@ -10,9 +10,9 @@
         }
     },
     "require": {
-        "php": "8.2.*",
+        "php": "8.3.*",
         "ext-fileinfo": "*",
         "aws/aws-sdk-php": "^3.255.7",
-        "bref/bref": "^1.7.15"
+        "bref/bref": "^2.0"
     }
 }

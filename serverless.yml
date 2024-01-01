@@ -7,7 +7,6 @@ provider:
     name: aws
     stage: dev
     region: eu-west-2
-    runtime: provided.al2
     environment:
         BUCKET_NAME: ${file(./config.${self:custom.stage}.json):websiteBucketName}
         FLICKR_API_KEY: ${file(./config.${self:custom.stage}.json):flickrApiKey}
@@ -31,16 +30,14 @@ plugins:
 
 functions:
     upload-assets:
-        handler: upload-assets.php
         description: 'Upload assets to S3 bucket'
-        layers:
-            - ${bref:layer.php-82}
+        handler: upload-assets.php
+        runtime: php-83
 
     update:
-        handler: update.php
         description: 'Create new Year HTML page'
-        layers:
-            - ${bref:layer.php-82}
+        handler: update.php
+        runtime: php-83
         events:
             - schedule: cron(0 22 * * ? *)  # 10pm every day
 

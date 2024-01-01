@@ -39,6 +39,7 @@ functions:
         handler: update.php
         runtime: php-83
         events:
+            - schedule: cron(0 10 * * ? *)  # 10am every day
             - schedule: cron(0 22 * * ? *)  # 10pm every day
 
 # Exclude files from deployment

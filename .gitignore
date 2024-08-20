@@ -1,3 +1,4 @@
 /vendor/
 /config.*.json
 /.serverless
+/node_modules

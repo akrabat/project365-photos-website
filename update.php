@@ -17,7 +17,13 @@ return function ($event) {
     // Fetch images from Flicker, create HTML page for year & upload to S3
     $templateDir = realpath(__DIR__ . '/templates');
     try {
-        $photos = (new PhotoFetcher())->fetchPhotosForYear($year, $flickrUserId);
+        $photos = [];
+        try {
+            $photos = (new PhotoFetcher())->fetchPhotosForYear($year, $flickrUserId);
+        } catch (Exception $e) {
+            $photos['photo'] = [];
+        }
+        
         $html = (new PageCreator())->createYearPage($year, $photos, $templateDir);
         if ($html) {
             $filename = "$year.html";

@@ -1,1 +1,1 @@
-{"name":"app","description":"","version":"0.1.0","devDependencies":{"serverless":"^3.26.0","serverless-lift":"^1.9.0"}}
+{"name":"app","description":"","version":"0.1.0","devDependencies":{"serverless":"^4.17.2","serverless-lift":"^1.31.0"}}

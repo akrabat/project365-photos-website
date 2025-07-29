@@ -33,12 +33,12 @@ functions:
     upload-assets:
         description: 'Upload assets to S3 bucket'
         handler: upload-assets.php
-        runtime: php-83
+        runtime: php-84
 
     update:
         description: 'Create new Year HTML page'
         handler: update.php
-        runtime: php-83
+        runtime: php-84
         timeout: 30
         events:
             - schedule: cron(0 10,22 * * ? *)  # 10:00 and 22:00 every day

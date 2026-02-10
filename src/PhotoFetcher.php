@@ -42,7 +42,10 @@ class PhotoFetcher
         $data = json_decode((string)$response->getBody(), true);
 
         if (!is_array($data)) {
+            $params = $urlParamers;
+            $params['api_key'] = 'xxxx';
             error_log('Unexpected response from API.');
+            error_log('URL parameters: ' . json_encode($params));
             error_log('API response: ' . $response->getStatusCode());
             error_log('API body: ' . (string)$response->getBody());
             throw new RuntimeException('Unexpected response from API.');
@@ -55,7 +58,10 @@ class PhotoFetcher
             $photos[$date] = $photo;
         }
         if (empty($photos)) {
+            $params = $urlParamers;
+            $params['api_key'] = 'xxxx';
             error_log('No photos returned.');
+            error_log('URL parameters: ' . json_encode($params));
             error_log('API response: ' . $response->getStatusCode());
             error_log('API body: ' . (string)$response->getBody());
             throw new RuntimeException('No photos returned');

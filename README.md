@@ -41,6 +41,8 @@ To initially deploy, or if you change any files:
 
 ## Making changes (e.g. for new year)
 
+Note that no changes are needed for a standard year roll-over.
+
 1. Update `assets/year.html`, `assets/index.html` and possibly `templates/*.phtml`
 2. Deploy: `sls deploy --aws-profile project365 --stage=prod`
 3. Upload the new files to the bucket: `sls invoke --aws-profile project365 --stage=prod -f upload-assets`

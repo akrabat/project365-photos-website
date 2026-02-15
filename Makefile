@@ -6,5 +6,11 @@ list:
 init:  ## Install serverless
 	npm i serverless -g
 
+update: # update composer
+	composer install --no-dev --optimize-autoloader
+
+deploy:  ## Deploy
+	sls deploy --aws-profile project365 --stage=prod
+
 refresh:  ## rebuild this months page
 	sls invoke --aws-profile project365 --stage=prod -f update --log

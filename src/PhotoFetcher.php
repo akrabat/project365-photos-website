@@ -9,7 +9,7 @@ class PhotoFetcher
 {
     protected $flickrApiKey;
 
-    public function __construct(string $flickrApiKey = null)
+    public function __construct(?string $flickrApiKey = null)
     {
         $this->flickrApiKey = $flickrApiKey ?? (string)getenv('FLICKR_API_KEY');
     }
@@ -41,7 +41,7 @@ class PhotoFetcher
         $response = $client->get($url);
         $data = json_decode((string)$response->getBody(), true);
 
-        if (!is_array($data)) {
+        if (!is_array($data['photos']['photo'] ?? null)) {
             $params = $urlParamers;
             $params['api_key'] = 'xxxx';
             error_log('Unexpected response from API.');

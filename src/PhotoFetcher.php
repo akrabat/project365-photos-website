@@ -30,7 +30,7 @@ class PhotoFetcher
             'nojsoncallback' => 1,
             'extras' => 'url_z, date_taken, owner_name', // 640px images, date photo taken
             'method' => 'flickr.photos.search',
-            'per_page' => '366',
+            'per_page' => '370',
             'sort' => 'date-taken-desc',
             'tags' => '365:' . $year,
         ];

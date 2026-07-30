@@ -2,7 +2,10 @@
     "type": "project",
     "config": {
         "optimize-autoloader": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "8.4.23"
+        }
     },
     "autoload": {
         "psr-4": {
@@ -13,6 +16,6 @@
         "php": "8.4.*",
         "ext-fileinfo": "*",
         "aws/aws-sdk-php": "^3.255.7",
-        "bref/bref": "^2.0"
+        "bref/bref": "^3.0"
     }
 }

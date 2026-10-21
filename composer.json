@@ -4,7 +4,7 @@
         "optimize-autoloader": true,
         "sort-packages": true,
         "platform": {
-            "php": "8.4.23"
+            "php": "8.4.27"
         }
     },
     "autoload": {
@@ -13,7 +13,7 @@
         }
     },
     "require": {
-        "php": "8.4.*",
+        "php": "8.4.27",
         "ext-fileinfo": "*",
         "aws/aws-sdk-php": "^3.255.7",
         "bref/bref": "^3.0"
